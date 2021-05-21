@@ -5,8 +5,7 @@
 - Scaled Horizontally 
 
 ### Data Storage Mechanism
-- STores the entire user and system data in giant sorted maps of key value pairs
-- 
+- Stores the entire user and system data in giant sorted maps of key value pairs
 
 ### Important Terms
 #### 1. Cluster
