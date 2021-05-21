@@ -71,4 +71,25 @@ To maintain the order between ranges, we need to index them. Thus, an index stru
 
 ### Transactions
 
+- Follow ACID semantics. (Atomicilty, Consistency, Isolation and Durability)
+- Serialisable isolation
+- Transactions can span arbitrary ranges
+- Conversational => The full set of operations is not required up front
+- Raft provides atomic writes to individual changes
+- Bootstrap transaction atomicity using Raft atomic writes
+- Transactipn record automatically flipped from pending to commit when a moajority of replicas ack
+- Leader committed first and then followers comitted. ACK for commiting also sent
+- gateway ACK client
+
+### SQL Data in KV World
+- The SQL data model needs to be mapped to KV data
+- ID id key. Everything else is comma separated value
+- Or /<Table>/<Index>/<ID> is key.
+    
+### SQL 
+
+
+
+
+
 Ref: https://youtu.be/OJySfiMKXLs
