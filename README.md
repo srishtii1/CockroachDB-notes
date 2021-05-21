@@ -23,6 +23,14 @@ Each individual system of the cluster forms the node
 #### 4. Range Indexing
 To maintain the order between ranges, we need to index them. Thus, an index structure is used to locate ranges (similar to a B-tree).
 
+### Architecture - Layered
+#### Last layer - Distributed, replicated, transactional Key Value Pairs
+- Keys and Values are strings (lexiographically ordered by key)
+- Multi Version Concurrency Control (MVCC) - Entries are not replaced but new versions are added and pointer to current version updates kinda like version control.
+- Monolithic Key Space - The entire set of key-value pairs is ordered and stored in one space. (Ordered becaus ethe SQL layer on top needs ordered data for certain queries)
+- This entire space is divided into chunks of 64 MB ranges
+- The Key Space is empty in the beginning and as the database is populated, the key space is divided into the 64MB ranges. When the size of teh database increases, the ranges increase and when the size decreases, the ranges are merged into one
+
 ### Replica
 #### Replication
 - CockroachDb maintains 3 replicas by default though this is modifiable
@@ -61,14 +69,6 @@ To maintain the order between ranges, we need to index them. Thus, an index stru
 
 #### Replica Placement: Latency and Geo-Partitioning
 - We apply a constraint which indicates regional placement so that we can ensure low latency access or jurisdictional control of data 
-
-### Architecture - Layered
-#### Last layer - Distributed, replicated, transactional Key Value Pairs
-- Keys and Values are strings (lexiographically ordered by key)
-- Multi Version Concurrency Control (MVCC) - Entries are not replaced but new versions are added and pointer to current version updates kinda like version control.
-- Monolithic Key Space - The entire set of key-value pairs is ordered and stored in one space. (Ordered becaus ethe SQL layer on top needs ordered data for certain queries)
-- This entire space is divided into chunks of 64 MB ranges
-- The Key Space is empty in the beginning and as the database is populated, the key space is divided into the 64MB ranges. When the size of teh database increases, the ranges increase and when the size decreases, the ranges are merged into one
 
 ### Transactions
 
