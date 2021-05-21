@@ -20,9 +20,10 @@ Each individual system of the cluster forms the node
 - Ranges are large enough to amortize indexing overhead
 - The data in the ranges is ordered and the ranges themselves are ordered
 
-#### Range Indexing
+#### 4. Range Indexing
 To maintain the order between ranges, we need to index them. Thus, an index structure is used to locate ranges (similar to a B-tree).
 
+### Replica
 #### Replication
 - CockroachDb maintains 3 replicas by default though this is modifiable
 - Each ranges uses an individual raft (A distributed concensus protocol) to keep its replicas in sync
@@ -84,12 +85,50 @@ To maintain the order between ranges, we need to index them. Thus, an index stru
 ### SQL Data in KV World
 - The SQL data model needs to be mapped to KV data
 - ID id key. Everything else is comma separated value
-- Or /<Table>/<Index>/<ID> is key.
+- Or /TableName/Index/ID is key.
     
-### SQL 
+### Distributed SQL Execution
+- Execute the given query at each node and execute the group part of the query again at the leader node
 
+### Distributed SQL Optimisation
+- An optimizer considers all the possible plans which are logically equivalent of the given query and chooses the best one
+The different transformations of preparing the query and data are:
+1. Fold constants
+2. Check types
+3. Resolve names
+4. Report Semantic errors
+5. Compute properties
+6. Retrieve and attach stats
+7. Cost-independent transformations
 
+#### 1. SQL Optimisation: Cost Independent Transformations
+- Some transformations always make sense. e.g. constant folding, filter push-down, etc. These transformations are cost independent. This means if it can be applied to query, it is applied
+- Domain specific Language for transformations (DSL) s complied down to code which efficiently matches the memo. 
 
+#### 2. SQL Optimisation: Cost Dependent Transformations
+- Some transformations are not universally good. E.g. index selection, join reordering, etc. These transformations are called cost based.
+- Need to try both paths of cost based transformations and need to maintain both original and transformed query
+- State explosion: thousand of possible query plans. Memo data structure maintains a forest of query plans 
+- Estimate cost of each query and select query with the lowest cost
+- Costing is based on table statistics and estimating the cardinality of inputs to relational expressions
+
+#### 3. SQL Optimisation: Cost-based Index Transformations
+The index to use for a query is affected by multiple factors
+- ilters and join conditions
+- equired ordering (Order By)
+- Implicit ordering (Group By)
+- Covering vs Non covering (i.e. an index join is required)
+- Locality
+
+for e.g. sorting is expensive when there is lots of data but cheap when small amount of data. 
+Instead of scanning the entire data where x belongs to \[10,inf) and then sorting on y (order by y)
+Scan all y and filter entries where x>10
+^^ most optimal solution
+
+#### 4. Locality aware SQL Optimisation
+- Network latencies and throughput are important
+- uplicate eread-,ostly data in each locality
+- Plan queries to use from the same locality 
 
 
 Ref: https://youtu.be/OJySfiMKXLs
