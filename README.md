@@ -72,3 +72,4 @@ To maintain the order between ranges, we need to index them. Thus, an index stru
 
 ### Transactions
 
+Ref: https://youtu.be/OJySfiMKXLs
